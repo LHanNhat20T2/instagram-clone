@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import getDataUri from "../utils/datauri.js";
 import cloudinary from "../utils/cloudinary.js";
+import { Post } from "../model/post.model.js";
 
 export const register = async (req, res) => {
     try {
@@ -63,7 +64,21 @@ export const login = async (req, res) => {
                 success: false,
             });
         }
+        const token = await jwt.sign(
+            { userId: user._id },
+            process.env.SECRET_KEY,
+            { expiresIn: "1d" }
+        );
 
+        const populatePosts = await Promise.all(
+            user.posts.map(async (postId) => {
+                const post = await Post.findById(postId);
+                if (post.author.equals(user._id)) {
+                    return post;
+                }
+                return null;
+            })
+        );
         user = {
             _id: user._id,
             username: user.username,
@@ -74,12 +89,6 @@ export const login = async (req, res) => {
             following: user.following,
             posts: user.posts,
         };
-
-        const token = await jwt.sign(
-            { userId: user._id },
-            process.env.SECRET_KEY,
-            { expiresIn: "1d" }
-        );
 
         return res
             .cookie("token", token, {
@@ -160,8 +169,8 @@ export const getSuggestedUsers = async (req, res) => {
     try {
         // loai bo chu ng dung`
         const suggestedUser = await User.find({
-            _id: { $ne: req.id }.select("-password"),
-        });
+            _id: { $ne: req.id },
+        }).select("-password");
         if (!suggestedUser) {
             return res.status(400).json({
                 message: "Không có người dùng",
@@ -179,36 +188,36 @@ export const getSuggestedUsers = async (req, res) => {
 
 export const followOrUnfollow = async (req, res) => {
     try {
-        const followBeo = req.id;
-        const NhatFollow = req.params.id;
-        if (followBeo === NhatFollow) {
-            return res.status(400).josn({
-                message: "K tìm thấy follow/unfollow của bạn",
-                success: false,
-            });
-        }
-
-        const user = await User.findById(followBeo);
-        const targetUser = await User.findById(NhatFollow);
-
-        if (!user || targetUser) {
+        const currentUserId = req.id; // ID của người dùng hiện tại
+        const targetUserId = req.params.id; // ID của người dùng muốn theo dõi/bỏ theo dõi
+        if (currentUserId.toString() === targetUserId.toString()) {
             return res.status(400).json({
-                message: "Người dùng k tìm thấy",
+                message: "Bạn không thể theo dõi hoặc bỏ theo dõi chính mình",
                 success: false,
             });
         }
 
-        const isFollowing = user.following.includes(NhatFollow);
+        const currentUser = await User.findById(currentUserId);
+        const targetUser = await User.findById(targetUserId);
+
+        if (!currentUser || !targetUser) {
+            return res.status(400).json({
+                message: "Người dùng không tìm thấy",
+                success: false,
+            });
+        }
+
+        const isFollowing = currentUser.following.includes(targetUserId);
         if (isFollowing) {
             //unfollow
             await Promise.all([
                 User.updateOne(
-                    { _id: followBeo },
-                    { $pull: { following: NhatFollow } }
+                    { _id: currentUserId },
+                    { $pull: { following: targetUserId } }
                 ),
                 User.updateOne(
-                    { _id: NhatFollow },
-                    { $pull: { followers: followBeo } }
+                    { _id: targetUserId },
+                    { $pull: { followers: currentUserId } }
                 ),
             ]);
             return res
@@ -217,12 +226,12 @@ export const followOrUnfollow = async (req, res) => {
         } else {
             await Promise.all([
                 User.updateOne(
-                    { _id: followBeo },
-                    { $push: { following: NhatFollow } }
+                    { _id: currentUserId },
+                    { $push: { following: targetUserId } }
                 ),
                 User.updateOne(
-                    { _id: NhatFollow },
-                    { $push: { followers: followBeo } }
+                    { _id: targetUserId },
+                    { $push: { followers: currentUserId } }
                 ),
             ]);
             return res
