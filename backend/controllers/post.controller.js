@@ -1,6 +1,6 @@
 import { User } from "../model/user.model.js";
 import { Post } from "../model/post.model.js"; //
-import { Comment } from "../model/comment.model.js"; //
+import { Comment } from "../model/comment.model.js";
 import cloudinary from "../utils/cloudinary.js";
 import sharp from "sharp";
 
@@ -11,36 +11,29 @@ export const addNewPost = async (req, res) => {
         const authorId = req.id;
 
         if (!image || !image.buffer) {
-            return res
-                .status(400)
-                .json({ message: "Ảnh không hợp lệ hoặc bị thiếu" });
+            return res.status(400).json({
+                success: false,
+                message: "Ảnh không hợp lệ hoặc bị thiếu",
+            });
         }
 
-        // Resize & optimize ảnh
+        // Resize & optimize ảnhss
         const optimizedImageBuffer = await sharp(image.buffer)
-            .resize({
-                width: 800,
-                height: 800,
-                fit: "inside",
-            })
+            .resize({ width: 800, height: 800, fit: "inside" })
             .toFormat("jpeg", { quality: 80 })
             .toBuffer();
 
-        // Chuyển ảnh thành base64
+        // Upload lên Cloudinary
         const fileUri = `data:image/jpeg;base64,${optimizedImageBuffer.toString(
             "base64"
         )}`;
-
-        // Upload lên Cloudinary
         const cloudResponse = await cloudinary.uploader.upload(fileUri);
 
-        // Tạo post
         const post = await Post.create({
             caption,
             image: cloudResponse.secure_url,
             author: authorId,
         });
-
         // Cập nhật danh sách bài viết của user
         const user = await User.findById(authorId);
         if (user) {
@@ -57,6 +50,7 @@ export const addNewPost = async (req, res) => {
         });
     } catch (error) {
         console.error(error);
+        return res.status(500).json({ success: false, message: "Lỗi server" });
     }
 };
 
@@ -175,7 +169,8 @@ export const addComment = async (req, res) => {
             text,
             author: commentId,
             post: postId,
-        }).populate({
+        });
+        await comment.populate({
             path: "author",
             select: "username profilePicture",
         });
