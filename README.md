@@ -1,4 +1,4 @@
-#INSTAGRAM CLONE 
+# INSTAGRAM CLONE 
 ## FEATURES
 
 *User*
@@ -6,19 +6,22 @@
 - Login
 - Logout
 - Get, edit profile
-- Suggested friend
+- Suggested profile
 - Folow or unfollow friend
-
+  
 *Post*
 - Add, get, delete post
 - Like or dislike post
 - Comment post
 - Bookmark post
 
-Messsage*
+*Messsage*
 - Chat
   
 ## TECHNOLOGIES
-*Backend*: Nodejs, expressjs, jwt, cloudinary, socket io, cookie
-*Frontend*: Reactjs, react-router-dom, react-hook-form, yup,redux toolkit, Axios, taildwincss, shadcn
-*Databse*: mongoose
+### Backend:
+- Nodejs, expressjs, jwt, cloudinary, socket io, cookie
+### Frontend:
+- Reactjs, react-router-dom, react-hook-form, yup,redux toolkit, Axios, taildwincss, shadcn
+### Database: 
+- Mongoose db
