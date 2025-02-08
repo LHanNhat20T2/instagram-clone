@@ -1,5 +1,11 @@
 import CreatePost from "@/components/CreatePost";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover";
 import { setAuthUser } from "@/redux/authSlice";
 import { setPosts, setSelectedPost } from "@/redux/postSlice";
 import Axios from "@/utils/Axios";
@@ -21,6 +27,10 @@ import { toast } from "sonner";
 const LeftSidebar = () => {
     const navigate = useNavigate();
     const { user } = useSelector((store) => store.auth);
+    const { likeNotification } = useSelector(
+        (store) => store.realTimeNotification
+    );
+    console.log("Danh sách thông báo hiện tại:", likeNotification);
     const dispatch = useDispatch();
     const [open, setOpen] = useState(false);
 
@@ -46,6 +56,10 @@ const LeftSidebar = () => {
             setOpen(true);
         } else if (textType === "Trang cá nhân") {
             navigate(`/profile/${user?._id}`);
+        } else if (textType === "Trang chủ") {
+            navigate("/");
+        } else if (textType === "Tin nhắn") {
+            navigate("/chat");
         }
     };
     const sidebarItem = [
@@ -99,6 +113,63 @@ const LeftSidebar = () => {
                     >
                         {item.icon}
                         <span>{item.text}</span>
+                        {item.text === "Thông báo" &&
+                            likeNotification.length > 0 && (
+                                <Popover>
+                                    <PopoverTrigger asChild>
+                                        <Button
+                                            size="icon"
+                                            className="absolute w-5 h-5 bg-red-600 rounded-full hover:bg-red-600 bottom-6 left-6"
+                                        >
+                                            {likeNotification.length}
+                                        </Button>
+                                    </PopoverTrigger>
+                                    <PopoverContent>
+                                        <div>
+                                            {likeNotification.length === 0 ? (
+                                                <p>No new notification</p>
+                                            ) : (
+                                                likeNotification.map(
+                                                    (notification) => {
+                                                        return (
+                                                            <div
+                                                                key={
+                                                                    notification.userId
+                                                                }
+                                                                className="flex items-center gap-2 my-2"
+                                                            >
+                                                                <Avatar>
+                                                                    <AvatarImage
+                                                                        src={
+                                                                            notification
+                                                                                .userDetails
+                                                                                ?.profilePicture
+                                                                        }
+                                                                    />
+                                                                    <AvatarFallback>
+                                                                        CN
+                                                                    </AvatarFallback>
+                                                                </Avatar>
+                                                                <p className="text-sm">
+                                                                    <span className="font-bold">
+                                                                        {
+                                                                            notification
+                                                                                .userDetails
+                                                                                ?.username
+                                                                        }
+                                                                    </span>{" "}
+                                                                    liked your
+                                                                    post
+                                                                </p>
+                                                            </div>
+                                                        );
+                                                    }
+                                                )
+                                            )}
+                                        </div>
+                                    </PopoverContent>
+                                </Popover>
+                            )}
                     </div>
                 ))}
             </div>

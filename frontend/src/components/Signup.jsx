@@ -1,65 +1,55 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { setAuthUser } from "@/redux/authSlice";
 import Axios from "@/utils/Axios";
 import SummaryApi from "@/utils/SummaryApi";
 import { Loader2 } from "lucide-react";
-import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { signupSchema } from "@/utils/ValidationSchema";
+import InputField from "@/components/InputField";
 
 const Signup = () => {
-    const [input, setInput] = useState({
-        username: "",
-        email: "",
-        password: "",
-    });
-
-    const [loading, setLoading] = useState(false);
+    const { user } = useSelector((store) => store.auth);
     const navigate = useNavigate();
     const dispatch = useDispatch();
-    const handleEventHandler = (e) => {
-        const { name, value } = e.target;
-        setInput((prev) => ({
-            ...prev,
-            [name]: value,
-        }));
-    };
 
-    const signupHandler = async (e) => {
-        e.preventDefault();
-        console.log(input);
+    const {
+        register,
+        handleSubmit,
+        formState: { errors, isSubmitting },
+        reset,
+    } = useForm({
+        resolver: yupResolver(signupSchema),
+    });
+
+    const signupHandler = async (data) => {
         try {
-            setLoading(true);
-            // Sử dụng axiosInstance đã tạo
-            const res = await Axios.post(SummaryApi.register.url, input);
+            const res = await Axios.post(SummaryApi.register.url, data);
 
             if (res.data.success) {
                 dispatch(setAuthUser(res.data.user));
                 navigate("/login");
                 toast.success(res.data.message);
+                reset();
             }
-
-            // Cập nhật state sau khi đăng ký thành công
-            setInput({
-                username: "",
-                email: "",
-                password: "",
-            });
         } catch (error) {
             console.error("Đăng ký thất bại:", error);
-            // Xử lý lỗi ở đây nếu cần
-        } finally {
-            setLoading(false);
+            toast.error("Có lỗi xảy ra, hãy thử lại!");
         }
     };
+
+    useEffect(() => {
+        if (user) navigate("/");
+    }, [user, navigate]);
 
     return (
         <div className="flex items-center justify-center w-screen mt-20">
             <form
-                onSubmit={signupHandler}
+                onSubmit={handleSubmit(signupHandler)}
                 className="flex flex-col gap-5 p-8 shadow-lg"
             >
                 <div>
@@ -70,36 +60,31 @@ const Signup = () => {
                         Đăng ký để xem ảnh và video từ bạn bè.
                     </p>
                 </div>
-                <div className="text-left">
-                    <Label className="text-base font-medium">Username</Label>
-                    <Input
-                        type="text"
-                        name="username"
-                        value={input.username}
-                        onChange={handleEventHandler}
-                        className="my-2 focus-visible:ring-transparent"
-                    />
-                </div>
-                <div className="text-left ">
-                    <Label className="text-base font-medium">Email</Label>
-                    <Input
-                        type="text"
-                        className="my-2 focus-visible:ring-transparent"
-                        name="email"
-                        value={input.email}
-                        onChange={handleEventHandler}
-                    />
-                </div>
-                <div className="text-left">
-                    <Label className="text-base font-medium">Password</Label>
-                    <Input
-                        type="password"
-                        className="my-2 focus-visible:ring-transparent"
-                        name="password"
-                        value={input.password}
-                        onChange={handleEventHandler}
-                    />
-                </div>
+
+                <InputField
+                    label="Tên người dùng"
+                    type="text"
+                    name="username"
+                    register={register}
+                    errors={errors}
+                />
+
+                <InputField
+                    label="Email"
+                    type="text"
+                    name="email"
+                    register={register}
+                    errors={errors}
+                />
+
+                <InputField
+                    label="Mật khẩu"
+                    type="password"
+                    name="password"
+                    register={register}
+                    errors={errors}
+                />
+
                 <p className="max-w-[260px] text-xs">
                     Những người dùng dịch vụ của chúng tôi có thể đã tải thông
                     tin liên hệ của bạn lên Instagram.{" "}
@@ -115,17 +100,24 @@ const Signup = () => {
                     </a>{" "}
                     cookie của chúng tôi.
                 </p>
-                {loading ? (
-                    <Button>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Đang tải
-                    </Button>
-                ) : (
-                    <Button className="bg-priBl">Đăng ký</Button>
-                )}
+
+                <Button
+                    type="submit"
+                    className="bg-priBl"
+                    disabled={isSubmitting}
+                >
+                    {isSubmitting ? (
+                        <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Đang tải...
+                        </>
+                    ) : (
+                        "Đăng ký"
+                    )}
+                </Button>
 
                 <p className="text-sm text-center">
-                    Bạn chưa có tài khoản ư?{" "}
+                    Bạn đã có tài khoản?{" "}
                     <Link to="/login" className="font-medium text-blue-400">
                         Đăng nhập
                     </Link>
@@ -134,4 +126,5 @@ const Signup = () => {
         </div>
     );
 };
+
 export default Signup;

@@ -41,5 +41,29 @@ const SummaryApi = {
         url: "/api/v1/user/suggested",
         method: "get",
     },
+    getUserProfile: (id) => ({
+        url: `/api/v1/user/${id}/profile`,
+        method: "get",
+    }),
+    editProfile: {
+        url: "/api/v1/user/profile/edit",
+        method: "post",
+    },
+    followOrUnfollow: (id) => ({
+        url: `/api/v1/user/followorunfollow/${id}`,
+        method: "post",
+    }),
+    sendMessage: (id) => ({
+        url: `/api/v1/message/send/${id}`,
+        method: "post",
+    }),
+    allMessage: (id) => ({
+        url: `/api/v1/message/all/${id}`,
+        method: "get",
+    }),
+    bookMark: (id) => ({
+        url: `/api/v1/post/${id}/bookmark`,
+        method: "post",
+    }),
 };
 export default SummaryApi;

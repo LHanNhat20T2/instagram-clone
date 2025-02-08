@@ -8,8 +8,8 @@ const Comment = ({ comment }) => {
                     <AvatarImage src={comment?.author?.profilePicture} />
                     <AvatarFallback>HN</AvatarFallback>
                 </Avatar>
-                <h1>
-                    {comment?.author.username}
+                <h1 className="text-sm font-bold">
+                    {comment?.author.username}{" "}
                     <span className="pl-1 font-normal">{comment?.text}</span>
                 </h1>
             </div>

@@ -5,26 +5,27 @@ import { Link } from "react-router-dom";
 
 const RightSidebar = () => {
     const { user } = useSelector((store) => store.auth);
+
+    if (!user) return null;
+
     return (
         <div className="my-10 w-fit pr-36">
             <div className="flex items-center gap-2">
                 <Link to={`/profile/${user._id}`}>
                     <Avatar>
                         <AvatarImage
-                            src={user?.profilePicture}
+                            src={user.profilePicture}
                             alt="post_image"
                         />
                         <AvatarFallback>HN</AvatarFallback>
                     </Avatar>
                 </Link>
-                <div className="">
+                <div>
                     <h1 className="text-sm font-semibold">
-                        <Link to={`/profile/${user?._id}`}>
-                            {user?.username}
-                        </Link>
+                        <Link to={`/profile/${user._id}`}>{user.username}</Link>
                     </h1>
                     <span className="text-sm text-gray-600">
-                        {user?.bio || "Web dev"}
+                        {user.bio || "Web dev"}
                     </span>
                 </div>
             </div>
@@ -32,4 +33,5 @@ const RightSidebar = () => {
         </div>
     );
 };
+
 export default RightSidebar;

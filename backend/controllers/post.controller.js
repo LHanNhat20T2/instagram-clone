@@ -3,6 +3,7 @@ import { Post } from "../model/post.model.js"; //
 import { Comment } from "../model/comment.model.js";
 import cloudinary from "../utils/cloudinary.js";
 import sharp from "sharp";
+import { getReceiverSocketId, io } from "../socket/socket.js";
 
 export const addNewPost = async (req, res) => {
     try {
@@ -106,52 +107,78 @@ export const getUserPost = async (req, res) => {
 
 export const likePost = async (req, res) => {
     try {
-        const userId = req.id;
+        const likeKrneWalaUserKiId = req.id;
         const postId = req.params.id;
         const post = await Post.findById(postId);
-        if (!post) {
-            return res.status(404).json({
-                message: "Bài viết k tìm thấy",
-                success: false,
-            });
-        }
+        if (!post)
+            return res
+                .status(404)
+                .json({ message: "Post not found", success: false });
 
-        // like logic
-        await post.updateOne({ $addToSet: { likes: userId } });
+        // like logic started
+        await post.updateOne({ $addToSet: { likes: likeKrneWalaUserKiId } });
         await post.save();
 
-        return res.status(200).json({
-            message: "Bài viết đã like",
-            success: true,
-        });
-    } catch (error) {
-        console.log(error);
-    }
-};
+        // implement socket io for real time notification
+        const user = await User.findById(likeKrneWalaUserKiId).select(
+            "username profilePicture"
+        );
 
+        const postOwnerId = post.author.toString();
+        if (postOwnerId !== likeKrneWalaUserKiId) {
+            // emit a notification event
+            const notification = {
+                type: "like",
+                userId: likeKrneWalaUserKiId,
+                userDetails: user,
+                postId,
+                message: "Your post was liked",
+            };
+            const postOwnerSocketId = getReceiverSocketId(postOwnerId);
+            io.to(postOwnerSocketId).emit("notification", notification);
+        }
+
+        return res
+            .status(200)
+            .json({ message: "Đã thích bài viết", success: true });
+    } catch (error) {}
+};
 export const dislikePost = async (req, res) => {
     try {
-        const userId = req.id;
+        const likeKrneWalaUserKiId = req.id;
         const postId = req.params.id;
         const post = await Post.findById(postId);
-        if (!post) {
-            return res.status(404).json({
-                message: "Thích bài viết",
-                success: false,
-            });
-        }
+        if (!post)
+            return res
+                .status(404)
+                .json({ message: "Không tìm thấy bài viết", success: false });
 
-        // like logic
-        await post.updateOne({ $pull: { likes: userId } });
+        // like logic started
+        await post.updateOne({ $pull: { likes: likeKrneWalaUserKiId } });
         await post.save();
 
-        return res.status(200).json({
-            message: "Hủy thích bài viết",
-            success: true,
-        });
-    } catch (error) {
-        console.log(error);
-    }
+        // implement socket io for real time notification
+        const user = await User.findById(likeKrneWalaUserKiId).select(
+            "username profilePicture"
+        );
+        const postOwnerId = post.author.toString();
+        if (postOwnerId !== likeKrneWalaUserKiId) {
+            // emit a notification event
+            const notification = {
+                type: "dislike",
+                userId: likeKrneWalaUserKiId,
+                userDetails: user,
+                postId,
+                message: "Bỏ thích bài viết",
+            };
+            const postOwnerSocketId = getReceiverSocketId(postOwnerId);
+            io.to(postOwnerSocketId).emit("notification", notification);
+        }
+
+        return res
+            .status(200)
+            .json({ message: "Bỏ thích bài viêt", success: true });
+    } catch (error) {}
 };
 
 export const addComment = async (req, res) => {
@@ -256,7 +283,7 @@ export const bookmarkPost = async (req, res) => {
                 .status(404)
                 .json({ messagE: "Bài viết k tìm thấy", success: false });
         const user = await User.findById(authorId);
-        if (user.bookmarks.includes(authorId)) {
+        if (user.bookmarks.includes(post._id)) {
             await user.updateOne({ $pull: { bookmarks: post._id } });
             await user.save();
             return res.status(200).json({

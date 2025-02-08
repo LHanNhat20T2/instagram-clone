@@ -28,7 +28,10 @@ const Post = ({ post }) => {
     const [liked, setLiked] = useState(post.likes.includes(user?._id) || false);
     const [postLike, setPostLike] = useState(post.likes.length);
     const [comment, setComment] = useState(post.comments);
-
+    console.log("Post comments:", post.comments);
+    const [isFollowing, setIsFollowing] = useState(
+        post.author?.followers?.includes(user?._id) || false
+    );
     const dispatch = useDispatch();
 
     const changeEventHandler = (e) => {
@@ -89,6 +92,20 @@ const Post = ({ post }) => {
             toast.error(error.response.data.message);
         }
     };
+    const handleFollowOrUnfollow = async () => {
+        try {
+            const res = await Axios({
+                ...SummaryApi.followOrUnfollow(post.author?._id),
+            });
+            if (res.data.success) {
+                setIsFollowing(!isFollowing);
+                toast.success(res.data.message);
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error("Có lỗi xảy ra!");
+        }
+    };
 
     const commentHandler = async () => {
         try {
@@ -119,6 +136,17 @@ const Post = ({ post }) => {
         }
     };
 
+    const bookmarkHandler = async () => {
+        try {
+            const res = await Axios({ ...SummaryApi.bookMark(post?._id) });
+            toast.success(res.data.message);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+    console.log("Comment Data:", comment);
+    console.log("Comment length:", comment.length);
+
     return (
         <div className="w-full max-w-md mx-auto my-8">
             <div className="flex items-center justify-between">
@@ -143,12 +171,16 @@ const Post = ({ post }) => {
                     </DialogTrigger>
                     <DialogContent className="flex flex-col items-center text-sm text-center">
                         <DialogTitle></DialogTitle>
-                        <Button
-                            variant="ghost"
-                            className="cursor-pointer w-fit text-[#ED3967] font-bold"
-                        >
-                            Bỏ theo dõi
-                        </Button>
+                        {post?.author?._id !== user?._id && (
+                            <Button
+                                variant="ghost"
+                                className="cursor-pointer w-fit text-[#ED3967] font-bold"
+                                onClick={handleFollowOrUnfollow}
+                            >
+                                {isFollowing ? "Bỏ theo dõi" : "Theo dõi"}
+                            </Button>
+                        )}
+
                         <Separator className="" />
                         <Button
                             variant="ghost"
@@ -204,6 +236,7 @@ const Post = ({ post }) => {
                         />
                     </div>
                     <FaRegBookmark
+                        onClick={bookmarkHandler}
                         size={24}
                         className="cursor-pointer hover:text-gray-600"
                     />
@@ -219,7 +252,10 @@ const Post = ({ post }) => {
                 {comment.length > 0 && (
                     <span
                         onClick={() => {
-                            dispatch(setSelectedPost(post));
+                            console.log("Selected Post:", post);
+                            dispatch(
+                                setSelectedPost({ ...post, comments: comment })
+                            );
                             setOpen(true);
                         }}
                         className="text-sm text-gray-400 cursor-pointer"
@@ -255,17 +291,20 @@ Post.propTypes = {
     post: PropTypes.shape({
         _id: PropTypes.string.isRequired,
         author: PropTypes.shape({
-            username: PropTypes.string,
             _id: PropTypes.string.isRequired,
-        }),
+            username: PropTypes.string.isRequired,
+            profilePicture: PropTypes.string,
+            followers: PropTypes.arrayOf(PropTypes.string),
+        }).isRequired,
         caption: PropTypes.string.isRequired,
-        image: PropTypes.string,
+        image: PropTypes.string.isRequired,
         likes: PropTypes.arrayOf(PropTypes.string),
         comments: PropTypes.arrayOf(
             PropTypes.shape({
                 _id: PropTypes.string.isRequired,
                 text: PropTypes.string.isRequired,
                 author: PropTypes.shape({
+                    _id: PropTypes.string.isRequired,
                     username: PropTypes.string,
                     profilePicture: PropTypes.string,
                 }).isRequired,

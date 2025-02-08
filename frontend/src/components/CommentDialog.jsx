@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import SummaryApi from "@/utils/SummaryApi";
 import Axios from "@/utils/Axios";
 import { setPosts } from "@/redux/postSlice";
+import PropTypes from "prop-types";
 
 const CommentDialog = ({ open, setOpen }) => {
     const [text, setText] = useState("");
@@ -41,7 +42,7 @@ const CommentDialog = ({ open, setOpen }) => {
             });
 
             if (res.data.success) {
-                const updatedCommentData = [...comment, res.data.comment]; // Đổi res.data.message thành res.data.comment
+                const updatedCommentData = [...comment, res.data.comment];
                 setComment(updatedCommentData);
 
                 // Tạo updatedPostData đúng cách
@@ -91,10 +92,7 @@ const CommentDialog = ({ open, setOpen }) => {
                                     </Avatar>
                                 </Link>
                                 <div>
-                                    <Link
-                                        to=""
-                                        className="text-xs font-semibold"
-                                    >
+                                    <Link to="" className="text-xs font-bold">
                                         {selectedPost?.author?.username}
                                     </Link>
                                     {/* <span className="text-xs text-gray-600">
@@ -147,4 +145,9 @@ const CommentDialog = ({ open, setOpen }) => {
         </Dialog>
     );
 };
+CommentDialog.propTypes = {
+    open: PropTypes.bool.isRequired,
+    setOpen: PropTypes.func.isRequired,
+};
+
 export default CommentDialog;
