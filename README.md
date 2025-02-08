@@ -6,9 +6,9 @@
 - Login
 - Logout
 - Get, edit profile
-- Suggested profile
+- Suggested friend
 - Folow or unfollow friend
-- 
+
 *Post*
 - Add, get, delete post
 - Like or dislike post
