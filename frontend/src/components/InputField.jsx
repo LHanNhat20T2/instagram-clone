@@ -4,12 +4,12 @@ import PropTypes from "prop-types";
 
 const InputField = ({
     label,
-    type,
+    type = "text",
     name,
     register,
-    errors,
-    validation,
-    placeholder,
+    errors = {},
+    validation = {},
+    placeholder = "",
 }) => {
     return (
         <div className="text-left">
@@ -26,6 +26,7 @@ const InputField = ({
         </div>
     );
 };
+
 InputField.propTypes = {
     label: PropTypes.string.isRequired,
     type: PropTypes.string,
@@ -36,9 +37,4 @@ InputField.propTypes = {
     placeholder: PropTypes.string,
 };
 
-InputField.defaultProps = {
-    type: "text",
-    errors: {},
-    validation: {},
-};
 export default InputField;

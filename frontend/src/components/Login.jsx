@@ -28,7 +28,7 @@ const Login = () => {
 
     const loginHandler = async (data) => {
         try {
-            const res = await Axios.post(SummaryApi.login.url, data);
+            const res = await Axios.post({ ...SummaryApi.login }, data);
             if (res.data.success) {
                 dispatch(setAuthUser(res.data.user));
                 navigate("/");
