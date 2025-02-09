@@ -66,6 +66,7 @@ const Login = () => {
                     name="email"
                     register={register}
                     errors={errors}
+                    placeholder="Email"
                 />
 
                 <InputField
@@ -74,6 +75,7 @@ const Login = () => {
                     name="password"
                     register={register}
                     errors={errors}
+                    placeholder="Mật khẩu"
                 />
 
                 <Button

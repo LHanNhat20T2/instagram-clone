@@ -67,6 +67,7 @@ const Signup = () => {
                     name="username"
                     register={register}
                     errors={errors}
+                    placeholder="Tên"
                 />
 
                 <InputField
@@ -75,6 +76,7 @@ const Signup = () => {
                     name="email"
                     register={register}
                     errors={errors}
+                    placeholder="Email"
                 />
 
                 <InputField
@@ -83,6 +85,7 @@ const Signup = () => {
                     name="password"
                     register={register}
                     errors={errors}
+                    placeholder="Mật khẩu"
                 />
 
                 <p className="max-w-[260px] text-xs">
