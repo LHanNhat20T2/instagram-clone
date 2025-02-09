@@ -2,13 +2,12 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toggleFollowUser } from "@/redux/authSlice";
 import Axios from "@/utils/Axios";
 import SummaryApi from "@/utils/SummaryApi";
-import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 
 const SuggestedUser = () => {
-    const { suggestedUsers, user } = useSelector((store) => store.auth);
+    const { suggestedUsers } = useSelector((store) => store.auth);
     const dispatch = useDispatch();
 
     const handleFollowOrUnfollow = async (userId) => {
