@@ -30,13 +30,13 @@ const LeftSidebar = () => {
     const { likeNotification } = useSelector(
         (store) => store.realTimeNotification
     );
-    console.log("Danh sách thông báo hiện tại:", likeNotification);
+    // console.log("Danh sách thông báo hiện tại:", likeNotification);
     const dispatch = useDispatch();
     const [open, setOpen] = useState(false);
 
     const logoutHandler = async () => {
         try {
-            const res = await Axios.get(SummaryApi.logout.url);
+            const res = await Axios({ ...SummaryApi.logout });
             if (res.data.success) {
                 dispatch(setAuthUser(null));
                 dispatch(setSelectedPost(null));

@@ -28,7 +28,7 @@ const Signup = () => {
 
     const signupHandler = async (data) => {
         try {
-            const res = await Axios.post({ ...SummaryApi.register }, data);
+            const res = await Axios({ ...SummaryApi.register }, data);
 
             if (res.data.success) {
                 dispatch(setAuthUser(res.data.user));
