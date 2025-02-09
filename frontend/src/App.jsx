@@ -72,7 +72,7 @@ function App() {
 
     useEffect(() => {
         if (user) {
-            socketRef.current = io("http://localhost:8000", {
+            socketRef.current = io("https://hannhat-ins.onrender.com/", {
                 query: { userId: user?._id },
                 transports: ["websocket"],
             });
