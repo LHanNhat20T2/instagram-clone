@@ -1,4 +1,4 @@
-export const baseUrl = "https://hannhat-ins.onrender.com/";
+export const baseUrl = "https://hannhat-ins.onrender.com";
 
 const SummaryApi = {
     register: {
