@@ -2,11 +2,11 @@ import { baseUrl } from "@/utils/SummaryApi";
 import axios from "axios";
 
 const Axios = axios.create({
-    baseURL: baseUrl, // Base URL cho tất cả các API
+    baseURL: "https://api-ecom.duthanhduoc.com/",
     headers: {
         "Content-Type": "application/json",
     },
-    withCredentials: true, // Nếu bạn cần cookies hoặc token cho mỗi yêu cầu
+    withCredentials: true,
 });
 
 export default Axios;
