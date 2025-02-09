@@ -6,7 +6,7 @@ import { io } from "socket.io-client";
 const useGetRTM = () => {
     const dispatch = useDispatch();
     const socketRef = useRef(null);
-    const messages = useSelector((store) => store.chat.messages || []); // Đảm bảo messages luôn là mảng
+    const messages = useSelector((store) => store.chat.messages || []);
     const { user } = useSelector((store) => store.auth);
 
     useEffect(() => {
@@ -17,7 +17,7 @@ const useGetRTM = () => {
             });
 
             socketRef.current.on("newMessage", (newMessage) => {
-                dispatch(setMessages([...messages, newMessage])); // Đảm bảo truyền vào mảng, không phải function
+                dispatch(setMessages([...messages, newMessage]));
             });
 
             return () => {
@@ -25,7 +25,7 @@ const useGetRTM = () => {
                 socketRef.current = null;
             };
         }
-    }, [user, dispatch, messages]); // messages trong dependency để luôn cập nhật đúng dữ liệu
+    }, [user, dispatch, messages]);
 
     return socketRef;
 };

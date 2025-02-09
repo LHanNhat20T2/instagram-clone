@@ -11,7 +11,7 @@ const useGetAllPost = () => {
             try {
                 const res = await Axios({ ...SummaryApi.getPost });
                 if (res.data.success) {
-                    console.log(res.data);
+                    // console.log(res.data);
                     dispatch(setPosts(res.data.posts));
                 }
             } catch (error) {

@@ -82,7 +82,7 @@ function App() {
             });
 
             socketRef.current.on("notification", (notification) => {
-                console.log("notifi", notification);
+                // console.log("notifi", notification);
                 dispatch(setLikeNotification(notification));
             });
 

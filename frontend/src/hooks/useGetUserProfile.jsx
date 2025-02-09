@@ -13,7 +13,7 @@ const useGetUsersProfile = (userId) => {
                     ...SummaryApi.getUserProfile(userId),
                 });
                 if (res.data.success) {
-                    console.log("user", res.data);
+                    // console.log("user", res.data);
                     dispatch(setUserProfile(res.data.user));
                 }
             } catch (error) {

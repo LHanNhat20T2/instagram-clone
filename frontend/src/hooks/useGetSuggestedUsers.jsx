@@ -11,7 +11,7 @@ const useGetSuggestedUsers = () => {
             try {
                 const res = await Axios({ ...SummaryApi.suggestedUsers });
                 if (res.data.success) {
-                    console.log(res.data);
+                    // console.log(res.data);
                     dispatch(setSuggestedUsers(res.data.user));
                 }
             } catch (error) {

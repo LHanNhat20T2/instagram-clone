@@ -28,7 +28,7 @@ const Post = ({ post }) => {
     const [liked, setLiked] = useState(post.likes.includes(user?._id) || false);
     const [postLike, setPostLike] = useState(post.likes.length);
     const [comment, setComment] = useState(post.comments);
-    console.log("Post comments:", post.comments);
+    // console.log("Post comments:", post.comments);
     const [isFollowing, setIsFollowing] = useState(
         post.author?.followers?.includes(user?._id) || false
     );
@@ -144,8 +144,8 @@ const Post = ({ post }) => {
             console.log(error);
         }
     };
-    console.log("Comment Data:", comment);
-    console.log("Comment length:", comment.length);
+    // console.log("Comment Data:", comment);
+    // console.log("Comment length:", comment.length);
 
     return (
         <div className="w-full max-w-md mx-auto my-8">
@@ -252,7 +252,7 @@ const Post = ({ post }) => {
                 {comment.length > 0 && (
                     <span
                         onClick={() => {
-                            console.log("Selected Post:", post);
+                            // console.log("Selected Post:", post);
                             dispatch(
                                 setSelectedPost({ ...post, comments: comment })
                             );
